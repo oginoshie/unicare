@@ -615,16 +615,24 @@ function showUndon() {
   const statusText = document.querySelector('.undon-status');
   if (!modal || !rainArea) return;
 
+  // ── 1. 前回の演出をリセット ──
   rainArea.innerHTML = '';
+  if (stamp) {
+    stamp.classList.remove('show');
+    // JSで一度「消去状態」を強制する
+    stamp.style.opacity = '0';
+    stamp.style.transform = 'rotate(15deg) scale(0)';
+  }
   modal.style.display = 'flex';
 
   const count = state.urchinCount;
-  document.getElementById('donCount').textContent = count;
+  const countDisplay = document.getElementById('donCount');
+  if (countDisplay) countDisplay.textContent = count;
 
-  // ── 1. ランク判定（10粒ずつの刻み） ──
+  // ── 2. ランク判定 ──
   let rank = '';
   if (count === 0) {
-    rank = ''; // 0粒は評価なし
+    rank = '';
   } else if (count <= 10) {
     rank = '小盛';
   } else if (count <= 20) {
@@ -637,7 +645,7 @@ function showUndon() {
     rank = '特盛';
   }
 
-  // ── 2. 表示テキストの出し分け（0粒なら「準備中」） ──
+  // ── 3. テキスト更新 ──
   if (statusText) {
     if (count === 0) {
       statusText.innerHTML = `まだ準備中だよ <span class="num">0</span> 粒`;
@@ -645,37 +653,42 @@ function showUndon() {
       statusText.innerHTML = `今週の累計：<span class="num">${count}</span> 粒（${rank}）`;
     }
   }
-  // ── 3. 粒を降らせる演出 ──
+
+  // ── 4. 粒を降らせる演出 ──
   const displayCount = Math.min(count, 150);
   for (let i = 0; i < displayCount; i++) {
     setTimeout(() => {
       const grain = document.createElement('div');
       grain.className = 'urchin-grain';
-      grain.style.left = 30 + Math.random() * 120 + 'px';
-      grain.style.top = 30 + Math.random() * 30 + 'px';
+      grain.style.left = 20 + Math.random() * 160 + 'px';
+      grain.style.top = 20 + Math.random() * 40 + 'px';
       grain.style.setProperty('--r', `${(Math.random() - 0.5) * 60}deg`);
-      grain.style.animation = `dropGrain 0.4s ease-out forwards`;
+      grain.style.animation = `dropGrain 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`;
       rainArea.appendChild(grain);
-    }, i * 30);
+    }, i * 20);
   }
 
-  // ── 4. スタンプ演出（ここが修正ポイント！） ──
-  if (stamp) {
-    // 0粒（rankが空）ならスタンプを消し去る
-    if (rank === '') {
-      stamp.classList.remove('show');
-      stamp.textContent = '';
-    } else {
-      // 1粒以上なら、ランク（小盛〜特盛）を書き込んでドカンと出す
-      stamp.textContent = rank;
-      stamp.classList.remove('show'); // いったんリセットしてアニメーションをやり直す
-      setTimeout(
-        () => {
-          stamp.classList.add('show');
-        },
-        displayCount * 30 + 500,
-      );
-    }
+  // ── 5. 降り終わった後にスタンプを「ドカン！」 ──
+  if (stamp && rank !== '') {
+    stamp.textContent = rank;
+
+    setTimeout(
+      () => {
+        // 重要：JSで指定したリセット用のスタイルを消去してCSS側に制御を戻す
+        stamp.style.opacity = '';
+        stamp.style.transform = '';
+
+        // CSSの .show クラスでアニメーション開始
+        stamp.classList.add('show');
+
+        // 衝撃の演出（モーダルを揺らす）
+        modal.animate(
+          [{ transform: 'translateY(0)' }, { transform: 'translateY(5px)' }, { transform: 'translateY(0)' }],
+          { duration: 100 },
+        );
+      },
+      displayCount * 20 + 400,
+    );
   }
 }
 
