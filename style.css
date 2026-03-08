@@ -41,6 +41,11 @@ body {
   font-size: 1.4rem;
   line-height: 1.6;
   min-height: 100vh;
+  max-width: 500px; /* スマホに最適な最大幅 */
+  margin: 0 auto; /* 左右中央寄せ */
+  background: var(--color-bg); /* アプリ自体の背景色をここで指定 */
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05); /* PCで見るときの境界線代わり */
+  position: relative;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -239,6 +244,8 @@ button *,
   background: var(--color-bg);
   padding: 0 var(--sp-m) var(--sp-l);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 500px;
 }
 
 .aquarium-wrapper {
