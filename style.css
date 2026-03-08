@@ -25,6 +25,7 @@
 
 html {
   font-size: 62.5%;
+  overflow-x: hidden;
 } /* 10px = 1rem */
 * {
   box-sizing: border-box;
@@ -38,23 +39,17 @@ body {
   color: var(--color-urchin);
   font-size: 1.4rem;
   padding-bottom: 12rem;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html,
-body {
-  overflow: hidden; /* 画面全体のスクロールを禁止 */
-  position: fixed;
   width: 100%;
-  height: 100%;
-  touch-action: none; /* 勝手なズームやスクロールを抑制 */
+  min-height: 100vh;
+  overflow-x: hidden; /* 横は禁止 */
+  overflow-y: auto; /* 縦は許可 */
+  -webkit-overflow-scrolling: touch; /* iPhoneでヌルヌル動かす */
+  position: relative; /* fixedはやめる */
 }
 
 main,
 .container {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  height: 100dvh; /* dynamic viewport height */
+  width: 100%;
 }
 
 button {
@@ -439,7 +434,7 @@ button {
   filter: brightness(0.95);
 }
 
-.btn-save {
+.btn-result {
   background: linear-gradient(135deg, #f2a93b, #e88f2a);
   color: white;
   border: none;
@@ -457,12 +452,12 @@ button {
   margin-top: 2rem;
 }
 
-.btn-save:hover {
+.btn-result:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(242, 169, 59, 0.4);
 }
 
-.btn-save:active {
+.btn-result:active {
   transform: translateY(0);
 }
 
@@ -579,6 +574,8 @@ input[type='range'] {
   font-family: var(--font-base);
   font-weight: 700;
   font-size: 1.5rem;
+}
+.btn-save {
 }
 .btn-cancel {
   background: #eee;
