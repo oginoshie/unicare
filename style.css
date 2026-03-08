@@ -50,14 +50,50 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── ボタン類のデフォルト青表示を徹底リセット（スライダー以外） ── */
 button,
 .btn-sm,
 .btn-large,
 .btn-undon,
-input,
-textarea {
-  -webkit-tap-highlight-color: transparent; /* タップ時の青い背景を消す */
-  outline: none; /* フォーカス時の青枠を消す */
+.btn-result,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── スライダー（input range）専用の設定 ── */
+input[type='range'] {
+  -webkit-appearance: none; /* 下地は消すが、あとでツマミを再定義する */
+  appearance: none;
+  background: #eee; /* スライダーの溝の色 */
+  height: 6px;
+  border-radius: 5px;
+  width: 100%;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* スライダーのツマミ（これが消えていたので再定義） */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--color-accent); /* ウニ色やアクセント色に */
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ── 文字選択の青も防止 ── */
+.urchin-app-container * {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .num {
@@ -640,4 +676,37 @@ input[type='range'] {
   background: linear-gradient(180deg, rgba(168, 206, 222, 0.6) 0%, rgba(124, 111, 160, 0.4) 100%);
   transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); /* 動きをリッチに */
   z-index: 1;
+}
+
+/* ── 各セクションのリセットボタン共通設定 ── */
+.btn-reset {
+  flex: none !important; /* 横幅を分け合わず固定にする */
+  width: 5.4rem; /* メインボタンの高さと合わせる */
+  height: 5.4rem;
+  padding: 0 !important; /* 内側の余白をリセット */
+  justify-content: center;
+  border-radius: 1.6rem; /* 他のボタンと角丸を合わせる */
+  background: #f8f8f8 !important; /* 少しだけ背景を落としてサブ要素感を出す */
+}
+
+/* リセットボタン内のアイコン設定 */
+.btn-reset .material-symbols-rounded {
+  color: #bbb !important; /* 普段はかなり控えめな色に */
+  font-size: 2.2rem;
+  margin: 0; /* アイコンを中央に配置 */
+}
+
+/* ホバー・アクティブ時の反応 */
+.btn-reset:active {
+  background: #eee !important;
+  transform: scale(0.9) !important;
+}
+
+.btn-reset:active .material-symbols-rounded {
+  color: var(--color-urchin) !important; /* 押した時だけ認識できる色に */
+}
+
+/* ── 水分補給エリア専用の並び調整 ── */
+.care-card .btn-row {
+  align-items: center; /* ボタンの高さがズレないように整列 */
 }

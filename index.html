@@ -66,8 +66,8 @@
           <button class="btn-sm" onclick="addWater(500)">
             <span class="material-symbols-rounded">water_bottle</span>+500ml
           </button>
-          <button class="btn-sm" onclick="resetWater()">
-            <span class="material-symbols-rounded">restart_alt</span>リセット
+          <button class="btn-sm btn-reset" onclick="resetWater()">
+            <span class="material-symbols-rounded">restart_alt</span>
           </button>
         </div>
         <input type="range" id="waterSlider" min="0" max="3000" step="50" oninput="setWater(this.value)" />
