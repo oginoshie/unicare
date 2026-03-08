@@ -440,6 +440,7 @@ setInterval(() => {
 
 // ── 10. 起動初期化 ──
 window.onload = () => {
+  document.addEventListener('touchstart', function () {}, true);
   checkNewDay();
   const slider = document.getElementById('waterSlider');
   if (slider) {

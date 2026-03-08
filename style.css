@@ -1,6 +1,7 @@
+/* ── 徹底リセット：Safariの青い枠・立体感を殺す ── */
 @charset "utf-8";
 
-/* ── 変数定義 ── */
+/* ── 変数定義 ── (変更なし) */
 :root {
   --color-white: #ffffff;
   --color-bg: #fafaf8;
@@ -11,12 +12,8 @@
   --color-border: #e0d8ee;
   --color-sat: #4a90e2;
   --color-sun: #e35c5c;
-
-  /* Typography */
   --font-base: 'M PLUS Rounded 1c', sans-serif;
   --font-num: 'Inter', sans-serif;
-
-  /* Spacing */
   --sp-xs: 0.4rem;
   --sp-s: 0.8rem;
   --sp-m: 1.6rem;
@@ -24,16 +21,17 @@
   --sp-xl: 4rem;
 }
 
-/* ── リセット & ベース ── */
-html {
-  font-size: 62.5%; /* 10px = 1rem */
-  scroll-behavior: smooth;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* Safariでタップした時の青いハイライトを完全に消す */
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -43,57 +41,105 @@ body {
   font-size: 1.4rem;
   line-height: 1.6;
   min-height: 100vh;
-  /* stickyを効かせる設定 */
   overflow-x: hidden;
-  overflow-y: auto;
-  position: relative;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── ボタン類のデフォルト青表示を徹底リセット（スライダー以外） ── */
-button,
-.btn-sm,
-.btn-large,
-.btn-undon,
-.btn-result,
-[role='button'] {
-  -webkit-tap-highlight-color: transparent !important;
+/* 全ボタン共通：Safariデフォルト解除 */
+button {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background: none;
+  border: none;
   outline: none !important;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  /* Safariのデフォルトの内側の影を消す */
+  box-shadow: none !important;
+  /* 連打時のテキスト選択（青反転）を防ぐ */
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* ── スライダー（input range）専用の設定 ── */
-input[type='range'] {
-  -webkit-appearance: none; /* 下地は消すが、あとでツマミを再定義する */
-  appearance: none;
-  background: #eee; /* スライダーの溝の色 */
-  height: 6px;
-  border-radius: 5px;
-  width: 100%;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+/* ── ボタンデザインの統一化 ── */
+
+/* 1. 今日のウニ丼を見る & おかわりお待ちしてます（フラット化） */
+.btn-undon,
+.btn-result {
+  background: var(--color-undon) !important;
+  color: white !important;
+  border-radius: 99.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: transform 0.1s cubic-bezier(0.2, 0, 0.2, 1);
+  box-shadow: 0 0.4rem 1.6rem rgba(242, 169, 59, 0.3) !important; /* 立体感ではなく柔らかな影に */
+  border: none !important;
 }
 
-/* スライダーのツマミ（これが消えていたので再定義） */
+.btn-undon {
+  padding: 2rem 5.6rem;
+  font-size: 1.9rem;
+  margin: 3rem auto;
+}
+
+.btn-result {
+  width: 100%;
+  padding: 1.6rem;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: none !important; /* モーダル内はよりフラットに */
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 2. アクション感（Safari対応） */
+button:active,
+.date-card:active {
+  transform: scale(0.94) !important; /* 沈み込む感覚を強化 */
+}
+
+.btn-undon:active,
+.btn-result:active {
+  transform: scale(0.96) translateY(2px) !important;
+  box-shadow: 0 0.2rem 0.8rem rgba(242, 169, 59, 0.2) !important;
+}
+
+/* ── リセットボタン（再定義） ── */
+.btn-reset {
+  flex: none !important;
+  width: 5.4rem !important;
+  height: 5.4rem !important;
+  background: #f0f0f0 !important;
+  border: 0.1rem solid var(--color-border) !important;
+  border-radius: 1.6rem !important;
+}
+
+.btn-reset .material-symbols-rounded {
+  color: #bbb !important;
+}
+
+/* ── スライダー（保護しつつSafari対応） ── */
+input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #eee;
+  border-radius: 5px;
+  outline: none;
+}
+
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--color-accent); /* ウニ色やアクセント色に */
+  width: 24px;
+  height: 24px;
+  background: var(--color-accent);
+  border: 3px solid white;
   border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* ── 文字選択の青も防止 ── */
-.urchin-app-container * {
-  -webkit-tap-highlight-color: transparent;
 }
 
 .num {
@@ -346,6 +392,7 @@ input[type='range']::-webkit-slider-thumb {
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
+  font-size: 1.5rem;
 }
 
 /* ボタン内のアイコンを--color-urchinに強制 */
