@@ -574,10 +574,39 @@ function showUndon() {
   const rainArea = document.getElementById('urchinRainArea');
   const stamp = document.getElementById('tokumoriStamp');
   if (!modal || !rainArea) return;
+
   rainArea.innerHTML = '';
   modal.style.display = 'flex';
-  document.getElementById('donCount').textContent = state.urchinCount;
-  const displayCount = Math.min(state.urchinCount, 150);
+
+  const count = state.urchinCount;
+  document.getElementById('donCount').textContent = count;
+
+  // ── ランク判定ロジックの修正 ──
+  let rank = '';
+  if (count === 0) {
+    rank = ''; // 0粒は表示なし
+  } else if (count <= 10) {
+    rank = '小盛';
+  } else if (count <= 20) {
+    rank = '並盛';
+  } else if (count <= 30) {
+    rank = '中盛';
+  } else if (count <= 40) {
+    rank = '大盛';
+  } else {
+    rank = '特盛';
+  }
+
+  // 表示テキストの更新
+  const statusText = document.querySelector('.undon-status');
+  if (count === 0) {
+    statusText.innerHTML = `まだ準備中だよ <span class="num">0</span> 粒`;
+  } else {
+    statusText.innerHTML = `今週の累計：<span class="num">${count}</span> 粒（${rank}）`;
+  }
+
+  // 粒を降らせる演出（上限150粒）
+  const displayCount = Math.min(count, 150);
   for (let i = 0; i < displayCount; i++) {
     setTimeout(() => {
       const grain = document.createElement('div');
@@ -589,13 +618,19 @@ function showUndon() {
       rainArea.appendChild(grain);
     }, i * 30);
   }
-  let rank = state.urchinCount >= 61 ? '特盛' : state.urchinCount >= 21 ? '大盛' : '並盛';
+
+  // スタンプ（特盛の時だけドカンと出す）
   if (stamp) {
-    stamp.textContent = rank;
-    stamp.classList.remove('show');
-    setTimeout(() => stamp.classList.add('show'), displayCount * 30 + 500);
+    if (rank === '特盛') {
+      stamp.textContent = rank;
+      stamp.classList.remove('show');
+      setTimeout(() => stamp.classList.add('show'), displayCount * 30 + 500);
+    } else {
+      stamp.classList.remove('show');
+    }
   }
 }
+
 function closeUndon() {
   document.getElementById('undonModal').style.display = 'none';
 }
