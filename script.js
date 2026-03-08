@@ -573,6 +573,7 @@ function showUndon() {
   const modal = document.getElementById('undonModal');
   const rainArea = document.getElementById('urchinRainArea');
   const stamp = document.getElementById('tokumoriStamp');
+  const statusText = document.querySelector('.undon-status');
   if (!modal || !rainArea) return;
 
   rainArea.innerHTML = '';
@@ -581,10 +582,10 @@ function showUndon() {
   const count = state.urchinCount;
   document.getElementById('donCount').textContent = count;
 
-  // ── ランク判定ロジックの修正 ──
+  // ── 1. ランク判定（10粒ずつの刻み） ──
   let rank = '';
   if (count === 0) {
-    rank = ''; // 0粒は表示なし
+    rank = ''; // 0粒は評価なし
   } else if (count <= 10) {
     rank = '小盛';
   } else if (count <= 20) {
@@ -597,14 +598,15 @@ function showUndon() {
     rank = '特盛';
   }
 
-  const statusText = document.querySelector('.undon-status');
-  if (count === 0) {
-    statusText.innerHTML = `まだ準備中だよ <span class="num">0</span> 粒`;
-  } else {
-    statusText.innerHTML = `今週の累計：<span class="num">${count}</span> 粒（${rank}）`;
+  // ── 2. 表示テキストの出し分け（0粒なら「準備中」） ──
+  if (statusText) {
+    if (count === 0) {
+      statusText.innerHTML = `まだ準備中だよ <span class="num">0</span> 粒`;
+    } else {
+      statusText.innerHTML = `今週の累計：<span class="num">${count}</span> 粒（${rank}）`;
+    }
   }
-
-  // 粒を降らせる演出（上限150粒）
+  // ── 3. 粒を降らせる演出 ──
   const displayCount = Math.min(count, 150);
   for (let i = 0; i < displayCount; i++) {
     setTimeout(() => {
@@ -618,14 +620,22 @@ function showUndon() {
     }, i * 30);
   }
 
-  // スタンプ（特盛の時だけドカンと出す）
+  // ── 4. スタンプ演出（ここが修正ポイント！） ──
   if (stamp) {
-    if (rank === '特盛') {
-      stamp.textContent = rank;
+    // 0粒（rankが空）ならスタンプを消し去る
+    if (rank === '') {
       stamp.classList.remove('show');
-      setTimeout(() => stamp.classList.add('show'), displayCount * 30 + 500);
+      stamp.textContent = '';
     } else {
-      stamp.classList.remove('show');
+      // 1粒以上なら、ランク（小盛〜特盛）を書き込んでドカンと出す
+      stamp.textContent = rank;
+      stamp.classList.remove('show'); // いったんリセットしてアニメーションをやり直す
+      setTimeout(
+        () => {
+          stamp.classList.add('show');
+        },
+        displayCount * 30 + 500,
+      );
     }
   }
 }
