@@ -167,8 +167,12 @@ button {
 /* ── Aquarium ── */
 .aquarium-container {
   padding: 0 var(--sp-m) var(--sp-l);
-  position: relative;
+  position: sticky; /* スクロールしても上部に残る */
+  top: 0;
+  z-index: 100;
+  background: var(--color-bg); /* 背景を隠さないように */
 }
+
 .aquarium-wrapper {
   position: relative;
   width: 100%;
@@ -231,12 +235,13 @@ button {
 .bubble-speech::after {
   content: '';
   position: absolute;
-  bottom: -0.6rem;
+  bottom: -1rem; /* 位置調整 */
   left: 50%;
   transform: translateX(-50%);
-  border-top: 0.6rem solid var(--color-white);
-  border-left: 0.6rem solid var(--color-border);
-  border-right: 0.6rem solid var(--color-border);
+  border-left: 0.8rem solid transparent;
+  border-right: 0.8rem solid transparent;
+  border-top: 1rem solid rgba(255, 255, 255, 0.95); /* 三角の色を本体と合わせる */
+  filter: drop-shadow(0 0.2rem 0.2rem rgba(0, 0, 0, 0.05)); /* ボーダーっぽく見せる影 */
 }
 
 #sparkleContainer {
@@ -302,6 +307,9 @@ button {
 }
 
 .info-icon {
+  position: relative;
+  cursor: pointer;
+  pointer-events: auto;
   font-size: 2rem;
   color: #ddd;
   cursor: pointer;
@@ -315,6 +323,13 @@ button {
   padding: 1.2rem;
   touch-action: manipulation; /* 連打などの誤作動防止 */
   z-index: 20; /* 他の要素より上に持ってくる */
+}
+
+.info-icon:active .tooltip,
+.info-icon.is-visible .tooltip {
+  visibility: visible;
+  opacity: 1;
+  bottom: 140%;
 }
 
 .tooltip {

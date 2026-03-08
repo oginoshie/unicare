@@ -86,7 +86,7 @@ function getTodayKey(date = new Date()) {
 }
 
 function updateUrchinCount(plus) {
-  state.urchinCount += plus;
+  state.urchinCount = Math.max(0, state.urchinCount + plus); // 0以下にならないように
   localStorage.setItem('unicare_total_urchin', state.urchinCount);
 }
 
@@ -133,11 +133,12 @@ function initCalendar() {
     d.setDate(now.getDate() + i);
     const card = document.createElement('div');
     card.className = 'date-card';
+    const key = getTodayKey(d);
     if (i === 0) card.classList.add('active');
     if (d.getDay() === 6) card.classList.add('sat');
     if (d.getDay() === 0) card.classList.add('sun');
     let inner = `<span class="day">${days[d.getDay()]}</span><span class="date">${d.getDate()}</span>`;
-    if (localStorage.getItem(`unicare_${getTodayKey(d)}`)) inner += `<div class="status-dot"></div>`;
+    if (localStorage.getItem(`unicare_${key}`)) inner += `<div class="status-dot"></div>`;
     card.innerHTML = inner;
     strip.appendChild(card);
   }
@@ -253,6 +254,9 @@ function setWater(val) {
   updateUI();
 }
 function resetWater() {
+  // 貯まった分（200mlにつき1粒）だけ累計から引く
+  const dailyContribution = Math.floor(state.water / 200);
+  updateUrchinCount(-dailyContribution);
   state.water = 0;
   speak('のど、乾いたなあ〜');
   updateUI();
@@ -263,6 +267,8 @@ function toggleStretch(id) {
   if (state.stretch[id]) {
     updateUrchinCount(1);
     speak(getRandom(MESSAGES.stretch));
+  } else {
+    updateUrchinCount(-1); // オフにした時は減らす
   }
   updateUI();
 }
@@ -274,20 +280,46 @@ function addSun() {
   updateUI();
 }
 function resetSun() {
+  updateUrchinCount(-state.sun);
   state.sun = 0;
   speak('また明日、太陽浴びよう');
   updateUI();
 }
 
 function startSleep() {
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const bedInput = document.getElementById('timeBed');
+  if (bedInput) bedInput.value = timeStr;
+
+  state.sleep.bed = timeStr;
   state.sleep.isSleeping = true;
   speak('おやすみ…いい夢見てね');
   updateUI();
 }
+
 function endSleep() {
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const wakeInput = document.getElementById('timeWake');
+  if (wakeInput) wakeInput.value = timeStr;
+
+  state.sleep.wake = timeStr;
   state.sleep.isSleeping = false;
-  updateUrchinCount(3);
-  speak('おはよう！よく眠れた？');
+
+  // 睡眠時間を計算して目標達成を判定
+  const [bh, bm] = state.sleep.bed.split(':').map(Number);
+  const [wh, wm] = state.sleep.wake.split(':').map(Number);
+  let diff = wh * 60 + wm - (bh * 60 + bm);
+  if (diff <= 0) diff += 1440;
+  const currentSleep = diff / 60;
+
+  if (currentSleep >= state.goals.sleep) {
+    updateUrchinCount(3);
+    speak('おはよう！目標達成だね、えらい！');
+  } else {
+    speak('おはよう！よく眠れた？');
+  }
   updateUI();
 }
 
@@ -334,6 +366,7 @@ function updateUI() {
   if (bg) bg.style.filter = `brightness(${Math.min(100 + state.sun * 2, 115)}%)`;
 
   const valSleepElem = document.getElementById('valSleep');
+  let currentSleep = 0;
   if (valSleepElem) {
     if (!state.sleep.bed || !state.sleep.wake) {
       valSleepElem.textContent = '0.0';
@@ -342,11 +375,11 @@ function updateUI() {
       const [wh, wm] = state.sleep.wake.split(':').map(Number);
       let diff = wh * 60 + wm - (bh * 60 + bm);
       if (diff <= 0) diff += 1440;
-      valSleepElem.textContent = (diff / 60).toFixed(1);
+      currentSleep = diff / 60;
+      valSleepElem.textContent = currentSleep.toFixed(1);
     }
   }
 
-  const currentSleep = parseFloat(valSleepElem?.textContent || '0');
   const isWaterDone = state.water >= state.goals.water;
   const isSleepDone = currentSleep >= state.goals.sleep;
   const canvas = document.getElementById('urchinCanvas');
@@ -477,4 +510,19 @@ window.onload = () => {
   URCHIN.init();
   initCalendar();
   updateUI();
+
+  // info-iconをタップした時にツールチップを出す（スマホ用）
+  document.querySelectorAll('.info-icon').forEach((icon) => {
+    icon.addEventListener('click', (e) => {
+      e.stopPropagation(); // 親要素へのクリック伝播を止める
+      icon.classList.toggle('is-visible');
+    });
+  });
+
+  // 画面のどこかを触ったらツールチップを閉じる
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.info-icon').forEach((icon) => {
+      icon.classList.remove('is-visible');
+    });
+  });
 };
