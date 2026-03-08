@@ -1,6 +1,7 @@
 @charset "utf-8";
+
+/* ── 変数定義 ── */
 :root {
-  /* Colors */
   --color-white: #ffffff;
   --color-bg: #fafaf8;
   --color-urchin: #3d3250;
@@ -15,7 +16,7 @@
   --font-base: 'M PLUS Rounded 1c', sans-serif;
   --font-num: 'Inter', sans-serif;
 
-  /* Spacing Tokens (1rem = 10px) */
+  /* Spacing */
   --sp-xs: 0.4rem;
   --sp-s: 0.8rem;
   --sp-m: 1.6rem;
@@ -23,10 +24,12 @@
   --sp-xl: 4rem;
 }
 
+/* ── リセット & ベース ── */
 html {
-  font-size: 62.5%;
-  overflow-x: hidden;
-} /* 10px = 1rem */
+  font-size: 62.5%; /* 10px = 1rem */
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -38,32 +41,20 @@ body {
   background: var(--color-bg);
   color: var(--color-urchin);
   font-size: 1.4rem;
-  padding-bottom: 12rem;
-  width: 100%;
+  line-height: 1.6;
   min-height: 100vh;
-  overflow-x: hidden; /* 横は禁止 */
-  overflow-y: auto; /* 縦は許可 */
-  -webkit-overflow-scrolling: touch; /* iPhoneでヌルヌル動かす */
-  position: relative; /* fixedはやめる */
-}
-
-main,
-.container {
-  width: 100%;
-}
-
-button {
-  -webkit-appearance: none;
-  appearance: none;
-  color: inherit; /* 親の文字色を引き継ぐ */
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent; /* タップした時の青い網掛けを消す */
+  /* stickyを効かせる設定 */
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
 }
 
 .num {
   font-family: var(--font-num);
   font-weight: 600;
 }
+
 .material-symbols-rounded {
   font-variation-settings:
     'FILL' 1,
@@ -73,7 +64,7 @@ button {
   vertical-align: middle;
 }
 
-/* ── Layout Components ── */
+/* ── ヘッダー ── */
 .app-header {
   padding: var(--sp-xl) var(--sp-l) var(--sp-l);
   text-align: center;
@@ -87,7 +78,6 @@ button {
 }
 .app-logo-icon {
   font-size: 3.2rem;
-  color: var(--color-urchin);
 }
 .app-title {
   font-size: 2.6rem;
@@ -100,17 +90,12 @@ button {
   display: block;
 }
 
-.calendar-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem;
-  margin-bottom: var(--sp-l);
-}
+/* ── カレンダー ── */
 .calendar-strip {
   display: flex;
+  justify-content: center;
   gap: 0.8rem;
+  margin-bottom: var(--sp-l);
 }
 .date-card {
   width: 4.4rem;
@@ -122,16 +107,12 @@ button {
   justify-content: center;
   align-items: center;
   border: 0.1rem solid var(--color-border);
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: visible;
 }
 .date-card.active {
   background: var(--color-accent);
-  color: var(--color-white);
+  color: white;
   border: none;
   transform: scale(1.05);
-  box-shadow: inset 0 0 0 1px var(--primary);
 }
 .date-card.sat {
   color: var(--color-sat);
@@ -141,36 +122,18 @@ button {
 }
 .date-card.active.sat,
 .date-card.active.sun {
-  color: var(--color-white);
-}
-.date-card .day {
-  font-size: 1.1rem;
-  margin-bottom: 0.2rem;
-}
-.date-card .date {
-  font-family: var(--font-num);
-  font-size: 1.6rem;
-  font-weight: 700;
-}
-.status-dot {
-  position: absolute;
-  bottom: -1.2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 50%;
-  background: var(--color-undon);
-  opacity: 0.9;
+  color: white;
 }
 
-/* ── Aquarium ── */
+/* ── 水槽（固定エリア） ── */
 .aquarium-container {
-  padding: 0 var(--sp-m) var(--sp-l);
-  position: sticky; /* スクロールしても上部に残る */
+  position: -webkit-sticky;
+  position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--color-bg); /* 背景を隠さないように */
+  background: var(--color-bg);
+  padding: 0 var(--sp-m) var(--sp-l);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
 }
 
 .aquarium-wrapper {
@@ -182,6 +145,17 @@ button {
   overflow: hidden;
   box-shadow: inset 0 0.8rem 2.4rem rgba(168, 206, 222, 0.2);
 }
+
+#urchinCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 5;
+  display: block;
+}
+
 .water-fill {
   position: absolute;
   bottom: 0;
@@ -191,27 +165,10 @@ button {
   transition: height 1s ease;
   z-index: 1;
 }
-.water-surface {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0.6rem;
-  background: rgba(255, 255, 255, 0.4);
-  animation: surfaceWave 3s ease-in-out infinite alternate;
-}
-@keyframes surfaceWave {
-  0% {
-    transform: translateY(-0.2rem);
-  }
-  100% {
-    transform: translateY(0.2rem);
-  }
-}
 
 .bubble-speech {
   position: absolute;
-  top: 2rem;
+  top: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.95);
@@ -220,70 +177,23 @@ button {
   font-size: 1.4rem;
   font-weight: 500;
   z-index: 10;
-  line-height: 1.5;
-  box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
   border: 0.1rem solid var(--color-border);
-  max-width: 95%;
   width: max-content;
+  max-width: 90%;
   text-align: center;
   pointer-events: none;
-  min-height: 4.4rem;
-  display: flex;
-  align-items: center;
-  white-space: pre-wrap;
-}
-.bubble-speech::after {
-  content: '';
-  position: absolute;
-  bottom: -1rem; /* 位置調整 */
-  left: 50%;
-  transform: translateX(-50%);
-  border-left: 0.8rem solid transparent;
-  border-right: 0.8rem solid transparent;
-  border-top: 1rem solid rgba(255, 255, 255, 0.95); /* 三角の色を本体と合わせる */
-  filter: drop-shadow(0 0.2rem 0.2rem rgba(0, 0, 0, 0.05)); /* ボーダーっぽく見せる影 */
 }
 
-#sparkleContainer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-}
-#bubbleContainer {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-.bubble-particle {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  animation: rise linear forwards;
-}
-@keyframes rise {
-  to {
-    transform: translateY(-30rem);
-    opacity: 0;
-  }
-}
-#urchinCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  cursor: pointer;
-}
-
-/* ── Cards & Dashboard ── */
+/* ── ダッシュボード & カード ── */
 .dashboard {
-  padding: 0 var(--sp-m);
+  padding: var(--sp-l) var(--sp-m) 12rem; /* 横の余白 var(--sp-m) を維持 */
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  position: relative;
+  z-index: 10;
 }
+
 .care-card {
   background: var(--color-white);
   border-radius: 2.4rem;
@@ -291,83 +201,26 @@ button {
   box-shadow: 0 0.4rem 1.6rem rgba(61, 50, 80, 0.05);
   position: relative;
 }
+
+/* タイトルエリアの修正（ツールチップを吸着、ボタンを右へ） */
 .card-title-area {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.6rem; /* 文字とiアイコンの距離 */
   margin-bottom: 2rem;
 }
 .card-title-area h3 {
   font-size: 1.7rem;
   font-weight: 700;
+  /* flex-grow: 1 を削除して右への押し出しを停止 */
 }
-.card-title-area .material-symbols-rounded:not(.info-icon) {
+.card-title-area .material-symbols-rounded:first-child {
   color: var(--color-accent);
   font-size: 2.4rem;
+  margin-right: 0.4rem;
 }
 
-.info-icon {
-  position: relative;
-  cursor: pointer;
-  pointer-events: auto;
-  font-size: 2rem;
-  color: #ddd;
-  cursor: pointer;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.4rem;
-  width: 4.4rem; /* 指の太さ（44px相当）まで領域を広げる */
-  height: 4.4rem;
-  margin: -1.2rem; /* 広げた分、周りの要素を押し出さないようにネガティブマージンで調整 */
-  padding: 1.2rem;
-  touch-action: manipulation; /* 連打などの誤作動防止 */
-  z-index: 20; /* 他の要素より上に持ってくる */
-}
-
-.info-icon:active .tooltip,
-.info-icon.is-visible .tooltip {
-  visibility: visible;
-  opacity: 1;
-  bottom: 140%;
-}
-
-.tooltip {
-  visibility: hidden;
-  position: absolute;
-  bottom: 140%;
-  left: 0;
-  background: var(--color-urchin);
-  color: var(--color-white);
-  padding: 1.4rem 1.8rem;
-  border-radius: 1.2rem;
-  font-size: 1.2rem;
-  width: max-content;
-  max-width: 28rem;
-  z-index: 100;
-  opacity: 0;
-  transition: 0.3s;
-  line-height: 1.6;
-  pointer-events: none;
-  white-space: normal;
-  text-align: left;
-  box-shadow: 0 0.8rem 2.4rem rgba(0, 0, 0, 0.2);
-}
-.tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 0.6rem;
-  border-width: 0.6rem;
-  border-style: solid;
-  border-color: var(--color-urchin) transparent transparent transparent;
-}
-.info-icon:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-  bottom: 120%;
-}
-
+/* 目標設定ボタンだけを右端へ */
 .goal-btn {
   margin-left: auto;
   font-size: 1.2rem;
@@ -375,11 +228,62 @@ button {
   border: 0.1rem solid var(--color-accent);
   padding: 0.4rem 1.2rem;
   border-radius: 9.9rem;
+  background: white;
   cursor: pointer;
-  background: var(--color-white);
-  font-weight: 500;
 }
 
+/* ── ツールチップ（アイコンの下に表示） ── */
+.info-icon {
+  color: #ccc;
+  cursor: pointer;
+  font-size: 1.8rem;
+  position: relative;
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-urchin);
+  color: white;
+  padding: 1.2rem;
+  border-radius: 1rem;
+  font-size: 1.2rem;
+  width: 22rem;
+  max-width: 75vw;
+  z-index: 200;
+  transition: 0.3s ease;
+  line-height: 1.6;
+  pointer-events: none;
+  text-align: left;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+.tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0.8rem;
+  border-style: solid;
+  border-color: transparent transparent var(--color-urchin) transparent;
+}
+.info-icon:hover .tooltip,
+.info-icon.is-visible .tooltip {
+  visibility: visible;
+  opacity: 1;
+  top: 110%;
+}
+
+/* ── ボタン & アイコンカラー修正 ── */
 .btn-row {
   display: flex;
   gap: 1.2rem;
@@ -390,94 +294,67 @@ button {
   padding: 1.6rem 0.8rem;
   border-radius: 1.6rem;
   border: 0.1rem solid var(--color-border);
-  background: var(--color-white);
+  background: white;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: 1.4rem;
-  font-weight: 400;
-  font-family: var(--font-base);
-  transition:
-    transform 0.1s,
-    filter 0.1s;
   gap: 0.6rem;
 }
-.btn-sm .material-symbols-rounded {
-  font-size: 2.4rem;
-  color: var(--color-accent);
+
+/* ボタン内のアイコンを--color-urchinに強制 */
+.btn-sm .material-symbols-rounded,
+.btn-large .material-symbols-rounded {
+  color: var(--color-urchin);
+}
+
+/* アクティブ状態・アクセント色の時は白抜きに */
+.btn-sm.is-active,
+.btn-accent,
+.btn-dark {
+  border: none;
+}
+.btn-sm.is-active .material-symbols-rounded,
+.btn-accent .material-symbols-rounded,
+.btn-dark .material-symbols-rounded {
+  color: white !important;
 }
 .btn-sm.is-active {
   background: var(--color-accent);
-  color: var(--color-white);
-  border-color: var(--color-accent);
+  color: white;
 }
-.btn-sm.is-active .material-symbols-rounded {
-  color: var(--color-white);
+.btn-accent {
+  background: var(--color-accent) !important;
+  color: white !important;
+}
+.btn-dark {
+  background: var(--color-urchin) !important;
+  color: white !important;
 }
 
 .btn-large {
   flex: 2;
-  height: 5.4rem;
   flex-direction: row;
-  gap: 1rem;
-  font-size: 1.5rem;
-  font-weight: 400;
-}
-.btn-accent {
-  background: var(--color-accent) !important;
-  color: var(--color-white) !important;
-  border: none !important;
-}
-.btn-dark {
-  background: var(--color-urchin) !important;
-  color: var(--color-white) !important;
-  border: none !important;
-}
-.btn-center {
-  justify-content: center;
-  flex: 1;
-}
-.btn-reset {
-  flex: 0 0 7rem;
   height: 5.4rem;
-}
-.btn-sm:active,
-.btn-undon:active,
-.goal-btn:active {
-  transform: scale(0.96);
-  filter: brightness(0.95);
+  font-size: 1.5rem;
+  justify-content: center;
+  gap: 0.8rem;
 }
 
-.btn-result {
-  background: linear-gradient(135deg, #f2a93b, #e88f2a);
-  color: white;
-  border: none;
-  padding: 1.4rem 2rem;
-  border-radius: 50px; /* 丸みを出して優しく */
-  font-weight: bold;
-  font-size: 1.2rem;
-  letter-spacing: 0.05em;
-  box-shadow: 0 4px 15px rgba(242, 169, 59, 0.3);
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+/* ── フォーム & その他 ── */
+input[type='range'] {
   width: 100%;
-  margin-top: 2rem;
+  accent-color: var(--color-accent);
+  margin-top: 1.4rem;
 }
-
-.btn-result:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(242, 169, 59, 0.4);
+.sleep-input {
+  border: 0.1rem solid #eee;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  font-family: var(--font-num);
 }
-
-.btn-result:active {
-  transform: translateY(0);
-}
-
-/* Sleep Inputs */
-.status-text {
+.status-text,
+.sleep-total {
   text-align: right;
   font-size: 1.3rem;
   color: #888;
@@ -486,140 +363,15 @@ button {
 .sleep-calc-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   border-top: 0.1rem dashed #eee;
   padding-top: 1.5rem;
 }
-.sleep-input {
-  border: 0.1rem solid #eee;
-  padding: 0.4rem;
-  border-radius: 0.6rem;
-  font-family: var(--font-num);
-}
-.sleep-total {
-  text-align: center;
-  margin-top: 1.4rem;
-  font-size: 1.3rem;
-  color: #888;
-}
-#valSleep {
-  font-size: 1.8rem;
-  color: var(--color-urchin);
-}
 
-input[type='range'] {
-  width: 100%;
-  accent-color: var(--color-accent);
-  margin-top: 1.4rem;
-  height: 0.8rem;
-  border-radius: 0.4rem;
-}
-
-/* ── Modal ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 2rem;
-  backdrop-filter: blur(0.4rem);
-  /* 背景のフェードイン */
-  animation: fadeIn 0.2s ease-out forwards;
-}
-
-.modal-content {
-  background: var(--color-white);
-  width: 100%;
-  max-width: 32rem;
-  border-radius: 2.4rem;
-  padding: 3.2rem 2.4rem;
-  text-align: center;
-  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.1);
-  position: relative; /* ×ボタンの基準 */
-
-  /* ↓ ボタンの動きに合わせて下からふわっと出るアニメーション */
-  transform: translateY(2rem);
-  opacity: 0;
-  animation: modalUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s forwards;
-}
-
-/* ×ボタン（閉じる）のスタイル */
-.modal-close {
-  position: absolute;
-  top: 1.6rem;
-  right: 1.6rem;
-  cursor: pointer;
-  color: #ccc;
-  font-size: 2.4rem;
-  transition: color 0.2s;
-}
-.modal-close:hover {
-  color: var(--color-urchin);
-}
-
-.modal-content h4 {
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-}
-.modal-content input {
-  width: 100%;
-  padding: 1.2rem;
-  border: 0.2rem solid #f5f5f5;
-  border-radius: 1.2rem;
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 2.4rem;
-  font-family: var(--font-num);
-  font-weight: 700;
-  color: var(--color-urchin);
-}
-.modal-btns {
-  display: flex;
-  gap: 1.2rem;
-}
-.modal-btns button {
-  flex: 1;
-  padding: 1.4rem;
-  border-radius: 1.4rem;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-base);
-  font-weight: 700;
-  font-size: 1.5rem;
-}
-.btn-save {
-}
-.btn-cancel {
-  background: #eee;
-}
-
-/* アニメーション定義 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes modalUp {
-  from {
-    transform: translateY(2rem);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* ── Footer ── */
+/* ウニ丼ボタン */
 .btn-undon {
   background: var(--color-undon);
-  color: var(--color-white);
+  color: white;
   border: none;
   padding: 2rem 5.6rem;
   border-radius: 99.9rem;
@@ -627,73 +379,179 @@ input[type='range'] {
   font-weight: 700;
   box-shadow: 0 0.8rem 2.4rem rgba(242, 169, 59, 0.4);
   cursor: pointer;
-  margin: 4.8rem auto;
+  margin: 3rem auto;
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.btn-undon:active {
-  transform: scale(0.95); /* 押した時に少し沈む「ぷにっ」とした感触 */
-  box-shadow: 0 0.4rem 1.2rem rgba(242, 169, 59, 0.2);
 }
 
-.btn-undon span {
-  font-size: 2.4rem; /* アイコンを少しだけ大きくして、どんぶりの存在感を強調 */
+/* モーダル */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
-/* ── Effects ── */
-@keyframes urchin-glow {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 0.8rem rgba(242, 169, 59, 0.5));
-  }
-  50% {
-    filter: drop-shadow(0 0 2.5rem rgba(242, 169, 59, 0.9));
-  }
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 30rem; /* 前回のスリムなサイズ感に */
+  border-radius: 2.4rem;
+  padding: 3rem 2.4rem;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1);
 }
-.glow-active {
-  animation: urchin-glow 2s infinite ease-in-out;
-}
-.sparkle-particle {
+.modal-close {
   position: absolute;
-  width: 1.5rem;
-  height: 1.5rem;
-  background: currentColor;
-  z-index: 10000;
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-  pointer-events: none;
-  animation: sparkle-fall 1.5s linear forwards;
+  top: 1.8rem;
+  right: 1.8rem;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 2.2rem;
+  transition: color 0.2s;
 }
-@keyframes sparkle-fall {
+.modal-close:hover {
+  color: var(--color-urchin);
+}
+
+.modal-content h4 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--color-urchin);
+}
+/* 入力欄の調整：大きすぎず、中央に配置 */
+.modal-content input {
+  width: 80%;
+  padding: 1rem;
+  border: none;
+  border-bottom: 0.2rem solid var(--color-border);
+  font-size: 2.8rem;
+  text-align: center;
+  margin: 1rem 0 2.5rem;
+  font-family: var(--font-num);
+  font-weight: 700;
+  color: var(--color-accent);
+  outline: none;
+  transition: border-color 0.3s;
+}
+.modal-content input:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+/* ボタンエリア：横並びでスッキリ */
+.modal-btns {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.modal-btns .btn-sm {
+  flex: 1;
+  padding: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border-radius: 1.2rem;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #999;
+  border: none;
+}
+
+.btn-save {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+}
+
+/* ── ウニ丼モーダル内の装飾 ── */
+.undon-modal-content {
+  background: linear-gradient(to bottom, #fff, #fff9f0); /* 少し美味しそうな背景色 */
+}
+
+.undon-status {
+  margin-top: 1.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-urchin);
+}
+
+.tokumori-stamp {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 80px;
+  height: 80px;
+  border: 4px double #e35c5c;
+  color: #e35c5c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 900;
+  transform: rotate(15deg) scale(0);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.tokumori-stamp.show {
+  transform: rotate(-15deg) scale(1);
+  opacity: 0.8;
+}
+
+/* おかわりボタン（結果ボタン） */
+.btn-result {
+  background: var(--color-undon);
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 1.6rem;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #d48e28;
+  transition: transform 0.1s;
+}
+
+.btn-result:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #d48e28;
+}
+
+/* ウニの粒の落下アニメーション */
+@keyframes dropGrain {
   0% {
-    transform: translateY(0) rotate(0deg) scale(0);
+    transform: translateY(-100px) rotate(0deg);
     opacity: 0;
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(-4rem) rotate(90deg) scale(1.2);
   }
   100% {
-    transform: translateY(-18rem) rotate(360deg) scale(0.5);
-    opacity: 0;
+    transform: translateY(0) rotate(var(--r));
+    opacity: 1;
   }
 }
 
-/* ── ウニ丼演出 ── */
-.undon-modal-content {
-  max-width: 36rem;
-  overflow: hidden;
-}
+/* ウニ丼演出 */
 .donburi-container {
   position: relative;
   width: 200px;
   height: 160px;
-  margin: 4rem auto 2rem;
+  margin: 2rem auto;
 }
 .bowl {
   position: absolute;
   bottom: 0;
-  left: 0;
   width: 100%;
   height: 80px;
   background: #333;
@@ -709,57 +567,67 @@ input[type='range'] {
   background: #fff;
   border-radius: 80px 80px 0 0;
   z-index: 5;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 .urchin-grain {
   position: absolute;
-  width: 24px;
-  height: 18px;
+  width: 20px;
+  height: 14px;
   background: var(--color-undon);
-  border-radius: 50% 50% 40% 40%;
-  z-index: 8;
-  pointer-events: none;
-}
-.tokumori-stamp {
-  position: absolute;
-  top: -20px;
-  right: -20px;
-  width: 70px;
-  height: 70px;
-  border: 4px solid #e35c5c;
-  color: #e35c5c;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  font-weight: 900;
-  transform: rotate(15deg) scale(2);
-  opacity: 0;
-  z-index: 20;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.tokumori-stamp.show {
-  opacity: 0.8;
-  transform: rotate(15deg) scale(1);
+  z-index: 8;
 }
 
-@keyframes dropGrain {
-  0% {
-    transform: translateY(-200px) rotate(0deg);
+/* アニメーション */
+@keyframes rise {
+  to {
+    transform: translateY(-30rem);
     opacity: 0;
   }
-  100% {
-    transform: translateY(0) rotate(var(--r));
-    opacity: 1;
-  }
+}
+.bubble-particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: rise linear forwards;
 }
 
-/* モーダル内の閉じるアイコン用 */
-.undon-modal-content .material-symbols-rounded {
-  font-size: 2.4rem;
-  transition: color 0.2s;
+/* ── 追加・修正：ボタン押し込みアニメーション ── */
+.btn-sm,
+.btn-large,
+.btn-undon,
+.date-card {
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+  user-select: none;
 }
-.undon-modal-content .material-symbols-rounded:hover {
-  color: var(--color-urchin) !important;
+
+.btn-sm:active,
+.btn-large:active,
+.date-card:active {
+  transform: scale(0.95);
+}
+
+.btn-undon:active {
+  transform: scale(0.95) translateY(4px);
+  box-shadow: 0 0.4rem 1.2rem rgba(242, 169, 59, 0.2);
+}
+
+.bubble-particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.6); /* 白を少し強調 */
+  border-radius: 50%;
+  z-index: 3;
+  animation: rise linear forwards;
+}
+
+/* ── 修正：水位アニメーションを滑らかに ── */
+.water-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(168, 206, 222, 0.6) 0%, rgba(124, 111, 160, 0.4) 100%);
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); /* 動きをリッチに */
+  z-index: 1;
 }
