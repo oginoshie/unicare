@@ -165,6 +165,11 @@ function addWater(amt) {
     localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
   }
   speak(getRandom(MESSAGES.water));
+  const fill = document.getElementById('waterFill');
+  if (fill) {
+    fill.classList.add('is-rising'); // 揺れを大きくするクラスを付与
+    setTimeout(() => fill.classList.remove('is-rising'), 1500); // 1.5秒後に戻す
+  }
   updateUI();
 }
 
