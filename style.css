@@ -1,0 +1,721 @@
+@charset "utf-8";
+:root {
+  /* Colors */
+  --color-white: #ffffff;
+  --color-bg: #fafaf8;
+  --color-urchin: #3d3250;
+  --color-water: #a8cede;
+  --color-accent: #7c6fa0;
+  --color-undon: #f2a93b;
+  --color-border: #e0d8ee;
+  --color-sat: #4a90e2;
+  --color-sun: #e35c5c;
+
+  /* Typography */
+  --font-base: 'M PLUS Rounded 1c', sans-serif;
+  --font-num: 'Inter', sans-serif;
+
+  /* Spacing Tokens (1rem = 10px) */
+  --sp-xs: 0.4rem;
+  --sp-s: 0.8rem;
+  --sp-m: 1.6rem;
+  --sp-l: 2.4rem;
+  --sp-xl: 4rem;
+}
+
+html {
+  font-size: 62.5%;
+} /* 10px = 1rem */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-base);
+  background: var(--color-bg);
+  color: var(--color-urchin);
+  font-size: 1.4rem;
+  padding-bottom: 12rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.num {
+  font-family: var(--font-num);
+  font-weight: 600;
+}
+.material-symbols-rounded {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  vertical-align: middle;
+}
+
+/* ── Layout Components ── */
+.app-header {
+  padding: var(--sp-xl) var(--sp-l) var(--sp-l);
+  text-align: center;
+}
+.app-logo-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+.app-logo-icon {
+  font-size: 3.2rem;
+  color: var(--color-urchin);
+}
+.app-title {
+  font-size: 2.6rem;
+  font-weight: 700;
+}
+.app-subtitle {
+  font-size: 1.4rem;
+  color: #888;
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.calendar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: var(--sp-l);
+}
+.calendar-strip {
+  display: flex;
+  gap: 0.8rem;
+}
+.date-card {
+  width: 4.4rem;
+  height: 5.4rem;
+  border-radius: 1.2rem;
+  background: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 0.1rem solid var(--color-border);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: visible;
+}
+.date-card.active {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+  transform: scale(1.05);
+  box-shadow: 0 0.4rem 1.2rem rgba(124, 111, 160, 0.3);
+}
+.date-card.sat {
+  color: var(--color-sat);
+}
+.date-card.sun {
+  color: var(--color-sun);
+}
+.date-card.active.sat,
+.date-card.active.sun {
+  color: var(--color-white);
+}
+.date-card .day {
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+.date-card .date {
+  font-family: var(--font-num);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.status-dot {
+  position: absolute;
+  bottom: -1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--color-undon);
+  opacity: 0.9;
+}
+
+/* ── Aquarium ── */
+.aquarium-container {
+  padding: 0 var(--sp-m) var(--sp-l);
+  position: relative;
+}
+.aquarium-wrapper {
+  position: relative;
+  width: 100%;
+  height: 28rem;
+  background: linear-gradient(180deg, var(--color-white) 0%, #e8f0f4 100%);
+  border-radius: 0.8rem 0.8rem 5rem 5rem;
+  overflow: hidden;
+  box-shadow: inset 0 0.8rem 2.4rem rgba(168, 206, 222, 0.2);
+}
+.water-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(168, 206, 222, 0.6) 0%, rgba(124, 111, 160, 0.4) 100%);
+  transition: height 1s ease;
+  z-index: 1;
+}
+.water-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0.6rem;
+  background: rgba(255, 255, 255, 0.4);
+  animation: surfaceWave 3s ease-in-out infinite alternate;
+}
+@keyframes surfaceWave {
+  0% {
+    transform: translateY(-0.2rem);
+  }
+  100% {
+    transform: translateY(0.2rem);
+  }
+}
+
+.bubble-speech {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1.2rem 2rem;
+  border-radius: 2rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  z-index: 10;
+  line-height: 1.5;
+  box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
+  border: 0.1rem solid var(--color-border);
+  max-width: 90%;
+  text-align: center;
+  pointer-events: none;
+  min-height: 4.4rem;
+  display: flex;
+  align-items: center;
+  white-space: pre-wrap;
+}
+.bubble-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top: 0.6rem solid var(--color-white);
+  border-left: 0.6rem solid transparent;
+  border-right: 0.6rem solid transparent;
+}
+
+#sparkleContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+#bubbleContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.bubble-particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: rise linear forwards;
+}
+@keyframes rise {
+  to {
+    transform: translateY(-30rem);
+    opacity: 0;
+  }
+}
+#urchinCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  cursor: pointer;
+}
+
+/* ── Cards & Dashboard ── */
+.dashboard {
+  padding: 0 var(--sp-m);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.care-card {
+  background: var(--color-white);
+  border-radius: 2.4rem;
+  padding: var(--sp-l);
+  box-shadow: 0 0.4rem 1.6rem rgba(61, 50, 80, 0.05);
+  position: relative;
+}
+.card-title-area {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.card-title-area h3 {
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+.card-title-area .material-symbols-rounded:not(.info-icon) {
+  color: var(--color-accent);
+  font-size: 2.4rem;
+}
+
+.info-icon {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.4rem;
+}
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  bottom: 140%;
+  left: 0;
+  background: var(--color-urchin);
+  color: var(--color-white);
+  padding: 1.4rem 1.8rem;
+  border-radius: 1.2rem;
+  font-size: 1.2rem;
+  width: max-content;
+  max-width: 28rem;
+  z-index: 100;
+  opacity: 0;
+  transition: 0.3s;
+  line-height: 1.6;
+  pointer-events: none;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 0.8rem 2.4rem rgba(0, 0, 0, 0.2);
+}
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0.6rem;
+  border-width: 0.6rem;
+  border-style: solid;
+  border-color: var(--color-urchin) transparent transparent transparent;
+}
+.info-icon:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  bottom: 120%;
+}
+
+.goal-btn {
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: var(--color-accent);
+  border: 0.1rem solid var(--color-accent);
+  padding: 0.4rem 1.2rem;
+  border-radius: 9.9rem;
+  cursor: pointer;
+  background: var(--color-white);
+  font-weight: 500;
+}
+
+.btn-row {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.btn-sm {
+  flex: 1;
+  padding: 1.6rem 0.8rem;
+  border-radius: 1.6rem;
+  border: 0.1rem solid var(--color-border);
+  background: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-family: var(--font-base);
+  transition:
+    transform 0.1s,
+    filter 0.1s;
+  gap: 0.6rem;
+}
+.btn-sm .material-symbols-rounded {
+  font-size: 2.4rem;
+  color: var(--color-accent);
+}
+.btn-sm.is-active {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+}
+.btn-sm.is-active .material-symbols-rounded {
+  color: var(--color-white);
+}
+
+.btn-large {
+  flex: 2;
+  height: 5.4rem;
+  flex-direction: row;
+  gap: 1rem;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+.btn-accent {
+  background: var(--color-accent) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+}
+.btn-dark {
+  background: var(--color-urchin) !important;
+  color: var(--color-white) !important;
+  border: none !important;
+}
+.btn-center {
+  justify-content: center;
+  flex: 1;
+}
+.btn-reset {
+  flex: 0 0 7rem;
+  height: 5.4rem;
+}
+.btn-sm:active,
+.btn-undon:active,
+.goal-btn:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #f2a93b, #e88f2a);
+  color: white;
+  border: none;
+  padding: 1.4rem 2rem;
+  border-radius: 50px; /* 丸みを出して優しく */
+  font-weight: bold;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 15px rgba(242, 169, 59, 0.3);
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(242, 169, 59, 0.4);
+}
+
+.btn-save:active {
+  transform: translateY(0);
+}
+
+/* Sleep Inputs */
+.status-text {
+  text-align: right;
+  font-size: 1.3rem;
+  color: #888;
+  margin-top: 0.8rem;
+}
+.sleep-calc-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  border-top: 0.1rem dashed #eee;
+  padding-top: 1.5rem;
+}
+.sleep-input {
+  border: 0.1rem solid #eee;
+  padding: 0.4rem;
+  border-radius: 0.6rem;
+  font-family: var(--font-num);
+}
+.sleep-total {
+  text-align: center;
+  margin-top: 1.4rem;
+  font-size: 1.3rem;
+  color: #888;
+}
+#valSleep {
+  font-size: 1.8rem;
+  color: var(--color-urchin);
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--color-accent);
+  margin-top: 1.4rem;
+  height: 0.8rem;
+  border-radius: 0.4rem;
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  backdrop-filter: blur(0.4rem);
+  /* 背景のフェードイン */
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.modal-content {
+  background: var(--color-white);
+  width: 100%;
+  max-width: 32rem;
+  border-radius: 2.4rem;
+  padding: 3.2rem 2.4rem;
+  text-align: center;
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.1);
+  position: relative; /* ×ボタンの基準 */
+
+  /* ↓ ボタンの動きに合わせて下からふわっと出るアニメーション */
+  transform: translateY(2rem);
+  opacity: 0;
+  animation: modalUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s forwards;
+}
+
+/* ×ボタン（閉じる）のスタイル */
+.modal-close {
+  position: absolute;
+  top: 1.6rem;
+  right: 1.6rem;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 2.4rem;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: var(--color-urchin);
+}
+
+.modal-content h4 {
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+.modal-content input {
+  width: 100%;
+  padding: 1.2rem;
+  border: 0.2rem solid #f5f5f5;
+  border-radius: 1.2rem;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2.4rem;
+  font-family: var(--font-num);
+  font-weight: 700;
+  color: var(--color-urchin);
+}
+.modal-btns {
+  display: flex;
+  gap: 1.2rem;
+}
+.modal-btns button {
+  flex: 1;
+  padding: 1.4rem;
+  border-radius: 1.4rem;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-base);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+.btn-cancel {
+  background: #eee;
+}
+
+/* アニメーション定義 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes modalUp {
+  from {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── Footer ── */
+.btn-undon {
+  background: var(--color-undon);
+  color: var(--color-white);
+  border: none;
+  padding: 2rem 5.6rem;
+  border-radius: 99.9rem;
+  font-size: 1.9rem;
+  font-weight: 700;
+  box-shadow: 0 0.8rem 2.4rem rgba(242, 169, 59, 0.4);
+  cursor: pointer;
+  margin: 4.8rem auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.btn-undon:active {
+  transform: scale(0.95); /* 押した時に少し沈む「ぷにっ」とした感触 */
+  box-shadow: 0 0.4rem 1.2rem rgba(242, 169, 59, 0.2);
+}
+
+.btn-undon span {
+  font-size: 2.4rem; /* アイコンを少しだけ大きくして、どんぶりの存在感を強調 */
+}
+/* ── Effects ── */
+@keyframes urchin-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0.8rem rgba(242, 169, 59, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 2.5rem rgba(242, 169, 59, 0.9));
+  }
+}
+.glow-active {
+  animation: urchin-glow 2s infinite ease-in-out;
+}
+.sparkle-particle {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: currentColor;
+  z-index: 10000;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  pointer-events: none;
+  animation: sparkle-fall 1.5s linear forwards;
+}
+@keyframes sparkle-fall {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-4rem) rotate(90deg) scale(1.2);
+  }
+  100% {
+    transform: translateY(-18rem) rotate(360deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* ── ウニ丼演出 ── */
+.undon-modal-content {
+  max-width: 36rem;
+  overflow: hidden;
+}
+.donburi-container {
+  position: relative;
+  width: 200px;
+  height: 160px;
+  margin: 4rem auto 2rem;
+}
+.bowl {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: #333;
+  border-radius: 0 0 100px 100px;
+  z-index: 10;
+}
+.rice {
+  position: absolute;
+  bottom: 40px;
+  left: 20px;
+  width: 160px;
+  height: 70px;
+  background: #fff;
+  border-radius: 80px 80px 0 0;
+  z-index: 5;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+.urchin-grain {
+  position: absolute;
+  width: 24px;
+  height: 18px;
+  background: var(--color-undon);
+  border-radius: 50% 50% 40% 40%;
+  z-index: 8;
+  pointer-events: none;
+}
+.tokumori-stamp {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 70px;
+  height: 70px;
+  border: 4px solid #e35c5c;
+  color: #e35c5c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 900;
+  transform: rotate(15deg) scale(2);
+  opacity: 0;
+  z-index: 20;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.tokumori-stamp.show {
+  opacity: 0.8;
+  transform: rotate(15deg) scale(1);
+}
+
+@keyframes dropGrain {
+  0% {
+    transform: translateY(-200px) rotate(0deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) rotate(var(--r));
+    opacity: 1;
+  }
+}
+
+/* モーダル内の閉じるアイコン用 */
+.undon-modal-content .material-symbols-rounded {
+  font-size: 2.4rem;
+  transition: color 0.2s;
+}
+.undon-modal-content .material-symbols-rounded:hover {
+  color: var(--color-urchin) !important;
+}
