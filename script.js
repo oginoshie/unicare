@@ -419,62 +419,96 @@ const URCHIN = (() => {
   let canvas,
     ctx,
     spikes = [];
+
   function init() {
     canvas = document.getElementById('urchinCanvas');
     if (!canvas) return;
     ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+
+    // ── 修正1：サイズ設定を確実にする ──
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // トゲの初期化（一度だけ）
+    spikes = [];
     for (let i = 0; i < 16; i++) {
       const angle = Math.PI + 0.2 + (Math.PI * 2 - 0.4 - Math.PI) * (i / 15);
       spikes.push({ angle, phase: Math.random() * Math.PI * 2 });
     }
-    canvas.onclick = () => {
-      state.isVibrating = 30;
+
+    // ── 修正2：クリックイベントを確実に ──
+    canvas.onclick = (e) => {
+      e.preventDefault();
+      state.isVibrating = 20; // 30だと長すぎるので少し短くしてキレを出す
       speak('んふふ、くすぐったい');
     };
+
     draw();
   }
+
   function draw() {
+    // 描画前に一度クリア（canvasサイズが正しくないとここで消える）
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
     const valSleepElem = document.getElementById('valSleep');
     const sleepH = valSleepElem ? parseFloat(valSleepElem.textContent || 0) : 0;
     const stretchC = Object.values(state.stretch).filter(Boolean).length;
 
-    // ── 睡眠による変化を強調 ──
-    const baseR = 32 + Math.min(sleepH, 10) * 4.5; // 体がムクムク大きくなる
+    const baseR = 32 + Math.min(sleepH, 10) * 4.5;
     const bodyH = state.sleep.isSleeping ? baseR * 0.6 : baseR * 0.85;
     const spikeL = 22 + stretchC * 14;
-    const cx = canvas.width / 2;
-    let cy = canvas.height - (20 + (state.sleep.isSleeping ? 0 : 10));
-    const time = Date.now() * (state.isVibrating > 0 ? 0.02 : 0.003);
+
+    // ── 修正3：中心座標の計算を安定させる ──
+    let cx = width / 2;
+    let cy = height - (20 + (state.sleep.isSleeping ? 0 : 10));
+
+    const time = Date.now() * (state.isVibrating > 0 ? 0.05 : 0.003); // くすぐり中は速く
+
     if (state.isVibrating > 0) {
-      cx += (Math.random() - 0.5) * 2;
-      cy += (Math.random() - 0.5) * 2;
+      cx += (Math.random() - 0.5) * 4; // 揺れ幅を少しアップ
+      cy += (Math.random() - 0.5) * 4;
       state.isVibrating--;
     }
+
+    // 体の描画
     ctx.fillStyle = '#3D3250';
     ctx.beginPath();
-    ctx.ellipse(cx, cy, baseR, bodyH, 0, Math.PI, 0);
+    ctx.ellipse(cx, cy, baseR, bodyH, 0, Math.PI, Math.PI * 2, false);
     ctx.fill();
+
+    // トゲの描画
     spikes.forEach((s) => {
       const angle = s.angle + Math.sin(time + s.phase) * 0.05;
       const len = state.sleep.isSleeping ? spikeL * 0.4 : spikeL;
+
       const startX = cx + Math.cos(angle) * (baseR * 0.7);
       const startY = cy + Math.sin(angle) * (bodyH * 0.7);
       const ex = cx + Math.cos(angle) * (baseR + len);
       const ey = cy + Math.sin(angle) * (bodyH + len);
+
       ctx.beginPath();
       ctx.moveTo(startX, startY);
       ctx.lineTo(ex, ey);
       ctx.strokeStyle = '#3D3250';
-      // ── トゲの太さも睡眠時間で太くなるように ──
       ctx.lineWidth = 4 + Math.min(sleepH, 10) * 1.2;
       ctx.lineCap = 'round';
       ctx.stroke();
     });
+
     requestAnimationFrame(draw);
   }
+
   return { init };
 })();
 
