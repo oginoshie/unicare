@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no, address=no, email=no" />
     <title>ウニケア - Unicare</title>
     <link
       rel="stylesheet"
@@ -115,7 +116,7 @@
         </div>
       </div>
 
-      <div class="care-card">
+<div class="care-card">
         <div class="card-title-area">
           <span class="material-symbols-rounded">bedtime</span>
           <h3>睡眠</h3>
@@ -129,15 +130,16 @@
           <button class="btn-sm btn-large btn-center btn-accent" onclick="startSleep()">おやすみ</button>
           <button class="btn-sm btn-large btn-center btn-dark" onclick="endSleep()">起きた！</button>
         </div>
-        <div class="sleep-calc-row">
-          <span>就寝 <input type="time" id="timeBed" onchange="updateSleepTime()" class="sleep-input" /></span>
-          <span>起床 <input type="time" id="timeWake" onchange="updateSleepTime()" class="sleep-input" /></span>
+<div class="sleep-calc-row">
+          <label class="sleep-input-group" for="timeBed">
+            <span>就寝</span>
+            <input type="datetime-local" id="timeBed" onchange="updateSleepTime()" class="sleep-input" />
+          </label>
+          <label class="sleep-input-group" for="timeWake">
+            <span>起床</span>
+            <input type="datetime-local" id="timeWake" onchange="updateSleepTime()" class="sleep-input" />
+          </label>
         </div>
-        <div class="sleep-total">
-          計 <span id="valSleep" class="num">0.0</span> / <span id="goalSleepVal" class="num">7.0</span> 時間
-        </div>
-      </div>
-
       <center>
         <button class="btn-undon" onclick="handleUndonClick()">
           <span class="material-symbols-rounded">washoku</span> 今日のウニ丼を見る

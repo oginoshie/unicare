@@ -147,6 +147,19 @@ input[type='range']::-webkit-slider-thumb {
   font-weight: 600;
 }
 
+button,
+button *,
+.btn-sm,
+.btn-large,
+.num {
+  /* 親要素の色（--color-urchinなど）を強制的に継承させる */
+  color: inherit !important;
+  /* Safariが勝手に引く下線を消す */
+  text-decoration: none !important;
+  /* iOS Safariの電話番号自動リンク化などを防ぐ（念のため） */
+  -webkit-text-fill-color: currentColor;
+}
+
 .material-symbols-rounded {
   font-variation-settings:
     'FILL' 1,
@@ -434,17 +447,47 @@ input[type='range']::-webkit-slider-thumb {
   gap: 0.8rem;
 }
 
-/* ── フォーム & その他 ── */
+/* ── 睡眠入力エリア ── */
+.sleep-calc-row {
+  display: flex;
+  flex-direction: column; /* 縦に並べて押し間違いを防ぐ */
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 0.1rem dashed #eee;
+  padding-top: 1.5rem;
+}
+
+.sleep-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9f9; /* わずかな背景色で「入力できる場所」を強調 */
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.8rem;
+}
+
+.sleep-input-group label {
+  font-size: 1.1rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.sleep-input {
+  border: none;
+  background: transparent;
+  padding: 0.6rem;
+  font-family: var(--font-num);
+  font-size: 1.3rem;
+  color: var(--color-text);
+  outline: none;
+  cursor: pointer;
+}
+
+/* フォーム & その他（既存を維持） */
 input[type='range'] {
   width: 100%;
   accent-color: var(--color-accent);
   margin-top: 1.4rem;
-}
-.sleep-input {
-  border: 0.1rem solid #eee;
-  padding: 0.6rem;
-  border-radius: 0.6rem;
-  font-family: var(--font-num);
 }
 .status-text,
 .sleep-total {
@@ -452,13 +495,6 @@ input[type='range'] {
   font-size: 1.3rem;
   color: #888;
   margin-top: 0.8rem;
-}
-.sleep-calc-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-  border-top: 0.1rem dashed #eee;
-  padding-top: 1.5rem;
 }
 
 /* ウニ丼ボタン */
@@ -756,4 +792,64 @@ input[type='range'] {
 /* ── 水分補給エリア専用の並び調整 ── */
 .care-card .btn-row {
   align-items: center; /* ボタンの高さがズレないように整列 */
+}
+
+/* ── 【派手演出】キラキラ & 光のフレア ── */
+#sparkleContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  /* 容器全体を少し光らせる */
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+/* 光の粒子（十字架型） */
+.sparkle {
+  position: absolute;
+  background: #fff;
+  /* 十字架の形をよりシャープに */
+  clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
+  /* 初速を速く、後半はゆっくり余韻を残す */
+  animation: sparkle-out-rich 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  opacity: 0;
+}
+
+/* 光の輪（フレア） */
+.sparkle-flare {
+  position: absolute;
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 70%);
+  animation: flare-out 1s ease-out forwards;
+  opacity: 0;
+}
+
+/* 粒子の弾けるアニメーション（余韻長め、回転追加） */
+@keyframes sparkle-out-rich {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.4) rotate(90deg);
+  }
+  100% {
+    /* JSで指定された到達点まで飛ばす */
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0) rotate(270deg);
+    opacity: 0;
+  }
+}
+
+/* フレアが広がるアニメーション */
+@keyframes flare-out {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
 }
