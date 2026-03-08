@@ -179,13 +179,12 @@ function setWater(val) {
   updateUI();
 }
 
-/** 水分リセット：粒もしっかり減らす */
 function resetWater() {
   updateUrchinCount(-state.isDonCalculated.water);
   state.water = 0;
   state.isDonCalculated.water = 0;
   localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
-  speak('のど、乾いたなあ〜（リセットしたよ）');
+  speak('のど、乾いたなあ〜');
   updateUI();
 }
 
@@ -198,17 +197,15 @@ function addSun() {
   updateUI();
 }
 
-/** 日光リセット：粒もしっかり減らす */
 function resetSun() {
   updateUrchinCount(-state.isDonCalculated.sun);
   state.sun = 0;
   state.isDonCalculated.sun = 0;
   localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
-  speak('また明日、太陽浴びよう（リセットしたよ）');
+  speak('また明日、太陽浴びよう');
   updateUI();
 }
 
-/** ストレッチ：粒のマイナス連動対応 */
 function toggleStretch(id) {
   state.stretch[id] = !state.stretch[id];
   if (state.stretch[id]) {
@@ -219,6 +216,16 @@ function toggleStretch(id) {
     speak('あれ、やめちゃった？');
   }
   updateUI();
+}
+/** 睡眠目標の達成判定（共通処理） */
+function checkSleepGoal(hours) {
+  if (hours >= state.goals.sleep && !state.isDonCalculated.sleep) {
+    updateUrchinCount(3);
+    state.isDonCalculated.sleep = true;
+    localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
+    createSparkle();
+    speak('目標達成だね、えらい！');
+  }
 }
 
 /** 睡眠開始（おやすみボタン） */
@@ -247,7 +254,12 @@ function endSleep() {
 
   const bedDate = new Date(storedBed);
   const now = new Date();
-  const diffMs = now - bedDate;
+
+  // 計算ロジック：終了が開始より前なら「翌日」とみなして24時間加算
+  let diffMs = now - bedDate;
+  if (diffMs < 0) {
+    diffMs += 24 * 60 * 60 * 1000;
+  }
   const diffHours = Math.max(0, diffMs / (1000 * 60 * 60));
 
   state.sleep.isSleeping = false;
@@ -256,19 +268,19 @@ function endSleep() {
   const inputWake = document.getElementById('timeWake');
   if (inputWake) inputWake.value = toLocalISO(now);
 
+  // 表示の更新
   const valSleepElem = document.getElementById('valSleep');
-  if (valSleepElem) valSleepElem.textContent = diffHours.toFixed(1).replace('.0', '');
+  if (valSleepElem) {
+    valSleepElem.textContent = diffHours.toFixed(1).replace('.0', '');
+  }
 
-  // 達成判定
+  // 判定とメッセージ
   if (diffHours >= state.goals.sleep && !state.isDonCalculated.sleep) {
-    updateUrchinCount(3);
-    state.isDonCalculated.sleep = true;
-    localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
-    createSparkle();
-    speak('おはよう！目標達成だね、えらい！');
+    checkSleepGoal(diffHours);
   } else {
     speak(`おはよう！<br>${diffHours.toFixed(1)}時間眠れたんだね。`);
   }
+
   updateUI();
 }
 
@@ -276,57 +288,51 @@ function endSleep() {
 function updateSleepTime() {
   const bedVal = document.getElementById('timeBed')?.value;
   const wakeVal = document.getElementById('timeWake')?.value;
+
   if (bedVal && wakeVal) {
     const bedDate = new Date(bedVal);
     const wakeDate = new Date(wakeVal);
-    const diffMs = wakeDate - bedDate;
+
+    // 手入力でも「22時〜7時」を正しく扱う
+    let diffMs = wakeDate - bedDate;
+    if (diffMs < 0) {
+      diffMs += 24 * 60 * 60 * 1000;
+    }
     const diffHours = Math.max(0, diffMs / (1000 * 60 * 60));
 
     const valSleepElem = document.getElementById('valSleep');
-    if (valSleepElem) valSleepElem.textContent = diffHours.toFixed(1).replace('.0', '');
+    if (valSleepElem) {
+      valSleepElem.textContent = diffHours.toFixed(1).replace('.0', '');
+    }
 
+    // データの同期
     state.sleep.bedTimeObj = bedDate;
     localStorage.setItem('unicare_bed_time_obj', bedDate.toISOString());
+
+    // 手入力でも目標達成なら粒を増やす
+    checkSleepGoal(diffHours);
   }
   updateUI();
 }
 
-/** ウニ丼の粒を強制リセット（保守用） */
 function resetUrchinDon() {
   if (confirm('今週貯めたウニの粒をすべてリセットしますか？')) {
-    // 1. カウントをゼロにする
     state.urchinCount = 0;
-
-    // 2. 重要：今日の各アクションによる「計算済みフラグ」を物理的にゼロにする
-    // これをやらないと updateUI() が走った瞬間に今日の分が復活します
     state.isDonCalculated = { water: 0, sun: 0, sleep: false };
-
-    // 3. ローカルストレージを即座に上書き
     localStorage.setItem('unicare_total_urchin', 0);
     localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
-
-    // 4. UIの表示を消す
     const countDisplay = document.getElementById('donCount');
     if (countDisplay) countDisplay.textContent = '0';
-
     const rainArea = document.getElementById('urchinRainArea');
     if (rainArea) rainArea.innerHTML = '';
-
     const stamp = document.getElementById('tokumoriStamp');
     if (stamp) {
       stamp.classList.remove('show');
       stamp.textContent = '';
     }
-
-    // 5. 今日の履歴データもリセット後の状態で上書き保存
     saveData();
-
     speak('丼を空にしたよ。また明日から貯めよう！');
-
-    // 全体の更新（水槽の見た目など）
     updateUI();
-
-    // 少し待ってから閉じる
     setTimeout(closeUndon, 800);
   }
 }
@@ -339,9 +345,13 @@ function updateUI() {
   const fill = document.getElementById('waterFill');
   const valSunEl = document.getElementById('valSun');
   const bg = document.getElementById('aquariumBG');
+  const goalSleepEl = document.getElementById('goalSleep');
 
   if (valWaterEl) valWaterEl.textContent = state.water;
   if (goalWaterEl) goalWaterEl.textContent = state.goals.water;
+  if (goalSleepEl) {
+    goalSleepEl.textContent = state.goals.sleep.toFixed(1).replace('.0', '');
+  }
   if (slider) {
     slider.max = state.goals.water;
     slider.value = state.water;
@@ -356,7 +366,6 @@ function updateUI() {
     state.celebrated.water = true;
     speak('目標達成！<br>ウニが潤いで満たされたよ');
   }
-
   ['Morning', 'Noon', 'Night'].forEach((k) => {
     const b = document.getElementById('btn' + k);
     if (b) {
@@ -368,7 +377,7 @@ function updateUI() {
   saveData();
 }
 
-// ── 7. カレンダー & 演出 ──
+/// ── 7. カレンダー & 演出 ──
 function initCalendar() {
   const strip = document.getElementById('calendarStrip');
   if (!strip) return;
@@ -426,7 +435,9 @@ const URCHIN = (() => {
     const valSleepElem = document.getElementById('valSleep');
     const sleepH = valSleepElem ? parseFloat(valSleepElem.textContent || 0) : 0;
     const stretchC = Object.values(state.stretch).filter(Boolean).length;
-    const baseR = 32 + Math.min(sleepH, 10) * 3.5;
+
+    // ── 睡眠による変化を強調 ──
+    const baseR = 32 + Math.min(sleepH, 10) * 4.5; // 体がムクムク大きくなる
     const bodyH = state.sleep.isSleeping ? baseR * 0.6 : baseR * 0.85;
     const spikeL = 22 + stretchC * 14;
     const cx = canvas.width / 2;
@@ -452,7 +463,8 @@ const URCHIN = (() => {
       ctx.moveTo(startX, startY);
       ctx.lineTo(ex, ey);
       ctx.strokeStyle = '#3D3250';
-      ctx.lineWidth = 4 + Math.min(sleepH, 10) * 0.8;
+      // ── トゲの太さも睡眠時間で太くなるように ──
+      ctx.lineWidth = 4 + Math.min(sleepH, 10) * 1.2;
       ctx.lineCap = 'round';
       ctx.stroke();
     });

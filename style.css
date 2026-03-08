@@ -280,7 +280,7 @@ button *,
 
 .bubble-speech {
   position: absolute;
-  top: 1.5rem;
+  top: 4rem;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.95);
@@ -294,6 +294,32 @@ button *,
   max-width: 90%;
   text-align: center;
   pointer-events: none;
+}
+
+/* 1. 枠線用の三角形（少し大きく、borderと同じ色にする） */
+.bubble-speech::before {
+  content: '';
+  position: absolute;
+  top: 100%; /* 吹き出しの底辺に配置 */
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid var(--color-border); /* 枠線の色 */
+  z-index: -1; /* 本体より後ろに隠す */
+}
+
+/* 2. 中身を塗りつぶす白い三角形（1より少し小さくして、本体の色にする） */
+.bubble-speech::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgba(255, 255, 255, 0.95); /* 本体の背景色と同じにする */
+  z-index: 1; /* 本体の手前に出す */
 }
 
 /* ── ダッシュボード & カード ── */
@@ -496,12 +522,36 @@ input[type='range'] {
   accent-color: var(--color-accent);
   margin-top: 1.4rem;
 }
-.status-text,
-.sleep-total {
+
+/* ── ステータステキスト（現在 / 目標）の共通デザイン ── */
+.status-text {
   text-align: right;
   font-size: 1.3rem;
   color: #888;
-  margin-top: 0.8rem;
+  margin-top: 1.2rem;
+  display: flex;
+  align-items: baseline; /* 数字の下端を揃える */
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+/* 現在の数字（大きく、濃く） */
+.status-text .num:first-child {
+  font-size: 2.2rem; /* ぐっと大きく */
+  color: var(--color-urchin); /* ウニ色（濃い紫） */
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 目標の数字（少し小さく、薄く） */
+.status-text .num:last-child {
+  font-size: 1.4rem;
+  color: #aaa;
+}
+
+/* 「現在:」や「/」、「ml」「時間」などのラベル部分 */
+.status-text {
+  font-weight: 500;
 }
 
 /* ウニ丼ボタン */
