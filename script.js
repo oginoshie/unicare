@@ -597,7 +597,6 @@ function showUndon() {
     rank = '特盛';
   }
 
-  // 表示テキストの更新
   const statusText = document.querySelector('.undon-status');
   if (count === 0) {
     statusText.innerHTML = `まだ準備中だよ <span class="num">0</span> 粒`;
