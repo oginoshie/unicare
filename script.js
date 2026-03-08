@@ -96,6 +96,7 @@ function getTodayKey(date = new Date()) {
 
 // datetime-local(YYYY-MM-DDTHH:mm)形式の文字列を生成
 function toLocalISO(date) {
+  if (!date) return '';
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date - offset).toISOString().slice(0, 16);
 }
@@ -178,12 +179,13 @@ function setWater(val) {
   updateUI();
 }
 
+/** 水分リセット：粒もしっかり減らす */
 function resetWater() {
   updateUrchinCount(-state.isDonCalculated.water);
   state.water = 0;
   state.isDonCalculated.water = 0;
   localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
-  speak('のど、乾いたなあ〜');
+  speak('のど、乾いたなあ〜（リセットしたよ）');
   updateUI();
 }
 
@@ -196,15 +198,17 @@ function addSun() {
   updateUI();
 }
 
+/** 日光リセット：粒もしっかり減らす */
 function resetSun() {
   updateUrchinCount(-state.isDonCalculated.sun);
   state.sun = 0;
   state.isDonCalculated.sun = 0;
   localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
-  speak('また明日、太陽浴びよう');
+  speak('また明日、太陽浴びよう（リセットしたよ）');
   updateUI();
 }
 
+/** ストレッチ：粒のマイナス連動対応 */
 function toggleStretch(id) {
   state.stretch[id] = !state.stretch[id];
   if (state.stretch[id]) {
@@ -212,6 +216,7 @@ function toggleStretch(id) {
     speak(getRandom(MESSAGES.stretch));
   } else {
     updateUrchinCount(-1);
+    speak('あれ、やめちゃった？');
   }
   updateUI();
 }
@@ -284,6 +289,46 @@ function updateSleepTime() {
     localStorage.setItem('unicare_bed_time_obj', bedDate.toISOString());
   }
   updateUI();
+}
+
+/** ウニ丼の粒を強制リセット（保守用） */
+function resetUrchinDon() {
+  if (confirm('今週貯めたウニの粒をすべてリセットしますか？')) {
+    // 1. カウントをゼロにする
+    state.urchinCount = 0;
+
+    // 2. 重要：今日の各アクションによる「計算済みフラグ」を物理的にゼロにする
+    // これをやらないと updateUI() が走った瞬間に今日の分が復活します
+    state.isDonCalculated = { water: 0, sun: 0, sleep: false };
+
+    // 3. ローカルストレージを即座に上書き
+    localStorage.setItem('unicare_total_urchin', 0);
+    localStorage.setItem('unicare_don_calculated', JSON.stringify(state.isDonCalculated));
+
+    // 4. UIの表示を消す
+    const countDisplay = document.getElementById('donCount');
+    if (countDisplay) countDisplay.textContent = '0';
+
+    const rainArea = document.getElementById('urchinRainArea');
+    if (rainArea) rainArea.innerHTML = '';
+
+    const stamp = document.getElementById('tokumoriStamp');
+    if (stamp) {
+      stamp.classList.remove('show');
+      stamp.textContent = '';
+    }
+
+    // 5. 今日の履歴データもリセット後の状態で上書き保存
+    saveData();
+
+    speak('丼を空にしたよ。また明日から貯めよう！');
+
+    // 全体の更新（水槽の見た目など）
+    updateUI();
+
+    // 少し待ってから閉じる
+    setTimeout(closeUndon, 800);
+  }
 }
 
 // ── 6. UI 更新 ──

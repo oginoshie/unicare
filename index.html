@@ -2,7 +2,6 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="format-detection" content="telephone=no, address=no, email=no" />
     <title>ウニケア - Unicare</title>
     <link
@@ -116,7 +115,7 @@
         </div>
       </div>
 
-<div class="care-card">
+      <div class="care-card">
         <div class="card-title-area">
           <span class="material-symbols-rounded">bedtime</span>
           <h3>睡眠</h3>
@@ -130,7 +129,7 @@
           <button class="btn-sm btn-large btn-center btn-accent" onclick="startSleep()">おやすみ</button>
           <button class="btn-sm btn-large btn-center btn-dark" onclick="endSleep()">起きた！</button>
         </div>
-<div class="sleep-calc-row">
+        <div class="sleep-calc-row">
           <label class="sleep-input-group" for="timeBed">
             <span>就寝</span>
             <input type="datetime-local" id="timeBed" onchange="updateSleepTime()" class="sleep-input" />
@@ -140,25 +139,29 @@
             <input type="datetime-local" id="timeWake" onchange="updateSleepTime()" class="sleep-input" />
           </label>
         </div>
-      <center>
-        <button class="btn-undon" onclick="handleUndonClick()">
-          <span class="material-symbols-rounded">washoku</span> 今日のウニ丼
-        </button>
-      </center>
+      </div>
+
+      <button class="btn-undon" onclick="handleUndonClick()">
+        <span class="material-symbols-rounded">washoku</span> 今日のウニ丼
+      </button>
     </main>
 
     <div class="modal-overlay" id="undonModal">
       <div class="modal-content undon-modal-content">
         <span class="material-symbols-rounded modal-close" onclick="closeUndon()">close</span>
         <h4>今週のウニ丼</h4>
+
         <div class="donburi-container" id="donburiContainer">
           <div class="rice"></div>
           <div class="bowl"></div>
           <div id="urchinRainArea"></div>
           <div id="tokumoriStamp" class="tokumori-stamp"></div>
         </div>
+
         <div class="undon-status">今週の累計：<span id="donCount" class="num">0</span> 粒</div>
+
         <button onclick="closeUndon()" class="btn-result">おかわり、お待ちしてます</button>
+        <button class="btn-reset-link" onclick="resetUrchinDon()">丼をリセットする</button>
       </div>
     </div>
 

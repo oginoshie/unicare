@@ -853,3 +853,31 @@ input[type='range'] {
     opacity: 0;
   }
 }
+
+/* ── ウニ丼リセットボタン（控えめ） ── */
+.btn-reset-link {
+  background: none;
+  border: none;
+  color: #ccc; /* 背景に近い薄いグレー */
+  font-size: 1rem;
+  text-decoration: underline; /* リンクっぽく */
+  cursor: pointer;
+  margin-top: 10px;
+  padding: 5px;
+  transition: color 0.3s;
+}
+
+.btn-reset-link:hover {
+  color: #999; /* ホバーした時だけ少し濃くなる */
+}
+
+.undon-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn-reset-link {
+  position: relative;
+  z-index: 100000;
+  cursor: pointer; /* マウスを乗せた時に指マークになるか確認 */
+}
