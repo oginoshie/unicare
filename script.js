@@ -780,3 +780,33 @@ window.onload = () => {
       .catch((err) => console.error('SWの起動に失敗しちゃった...', err));
   }
 };
+
+// ── 9. おせっかいシステム（自動通知） ──
+async function osekaiNotification(title, body) {
+  // 通知が許可されていて、かつトグルがONの時だけ実行
+  const savedNotify = localStorage.getItem('unicare_notification');
+  if (Notification.permission === 'granted' && savedNotify === 'true') {
+    const reg = await navigator.serviceWorker.ready;
+    reg.showNotification(title, {
+      body: body,
+      icon: 'apple-touch-icon.png',
+      badge: 'apple-touch-icon.png',
+      tag: 'osekai', // 通知が重ならないようにタグ付け
+      renotify: true,
+    });
+  }
+}
+
+// 放置されている時にたまに通知する（例：3時間操作がない時）
+let osekaiTimer;
+function resetOsekaiTimer() {
+  clearTimeout(osekaiTimer);
+  osekaiTimer = setTimeout(() => {
+    const talk = getRandom(MESSAGES.auto.chat);
+    osekaiNotification('ウニが呼んでるよ', talk);
+  }, 1000 * 10); // 3時間（1000 * 60 * 60 * 3に書き換えて！）
+}
+
+// 操作するたびにタイマーをリセット
+document.addEventListener('click', resetOsekaiTimer);
+document.addEventListener('touchstart', resetOsekaiTimer);
