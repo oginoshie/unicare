@@ -13,6 +13,9 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@600&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="theme-color" content="#3D3250" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -34,6 +37,7 @@
         <span class="app-title">ウニケア</span>
       </div>
       <span class="app-subtitle">今日を整えて、ウニを育てる</span>
+
       <div class="calendar-container">
         <div class="calendar-strip" id="calendarStrip"></div>
       </div>
@@ -145,9 +149,17 @@
         </div>
       </div>
 
-      <button class="btn-undon" onclick="handleUndonClick()">
-        <span class="material-symbols-rounded">washoku</span> 今日のウニ丼
-      </button>
+      <button class="btn-undon"><span class="material-symbols-rounded">washoku</span> 今日のウニ丼</button>
+      <div class="setting-item">
+        <div class="setting-label">
+          <span class="material-symbols-rounded">notifications</span>
+          <span>通知をオンにする</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="notificationToggle" onchange="handleNotificationToggle(this)" />
+          <span class="slider"></span>
+        </label>
+      </div>
     </main>
 
     <div class="modal-overlay" id="undonModal">

@@ -628,21 +628,29 @@ input[type='range'] {
   font-weight: 500;
 }
 
-/* ウニ丼ボタン */
-.btn-undon {
-  background: var(--color-undon);
-  color: white;
-  border: none;
-  padding: 2rem 5.6rem;
-  border-radius: 99.9rem;
-  font-size: 1.9rem;
-  font-weight: 700;
-  box-shadow: 0 0.8rem 2.4rem rgba(242, 169, 59, 0.4);
-  cursor: pointer;
-  margin: 3rem auto;
+.btn-undon,
+.btn-notification {
+  width: 280px; /* 任意の固定幅。スマホの画面幅に合わせて調整してください */
+  max-width: 85%; /* 画面からはみ出さないための保険 */
+  margin-left: auto;
+  margin-right: auto;
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+/* ウニ丼ボタン */
+.btn-undon {
+  background: var(--color-undon) !important;
+  color: white !important;
+  border-radius: 99.9rem;
+  font-weight: 700;
   gap: 1rem;
+  padding: 2rem 0; /* 左右のpaddingを0にしてwidthを優先させる */
+  font-size: 1.9rem;
+  margin-top: 3rem;
+  margin-bottom: 1.2rem; /* 通知ボタンとの隙間 */
+  box-shadow: 0 0.8rem 2.4rem rgba(242, 169, 59, 0.4);
 }
 
 /* モーダル */
@@ -1011,4 +1019,74 @@ input[type='range'] {
   position: relative;
   z-index: 100000;
   cursor: pointer; /* マウスを乗せた時に指マークになるか確認 */
+}
+
+/* 設定アイテムの行 */
+.setting-item {
+  width: 280px;
+  margin: 0 auto 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* ラベルとスイッチを両端に */
+  padding: 1.2rem 1.6rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 1.6rem;
+  color: #888;
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.4rem;
+}
+
+.setting-label .material-symbols-rounded {
+  font-size: 2rem;
+  color: #bbb;
+}
+
+/* トグルスイッチ本体 */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ddd;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ON状態の時：ウニ色（アクセントカラー）に */
+input:checked + .slider {
+  background-color: var(--color-accent);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }

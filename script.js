@@ -707,18 +707,61 @@ setInterval(() => {
   }
 }, 10000);
 
+async function handleNotificationToggle(elem) {
+  if (elem.checked) {
+    if (!('Notification' in window)) {
+      alert('このブラウザは通知に対応していないみたい...');
+      elem.checked = false;
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    if (permission === 'granted') {
+      const reg = await navigator.serviceWorker.ready;
+      reg.showNotification('ウニケア', {
+        body: '通知がONになったよ！これからよろしくね。',
+        icon: 'apple-touch-icon.png',
+        badge: 'apple-touch-icon.png',
+      });
+      localStorage.setItem('unicare_notification', 'true');
+    } else {
+      alert('通知が拒否されています。ブラウザの設定から許可してね。');
+      elem.checked = false;
+    }
+  } else {
+    localStorage.setItem('unicare_notification', 'false');
+  }
+}
+
+// ── 8. 全体の初期化（window.onloadは1つにまとめる） ──
 window.onload = () => {
+  // iOS Safariのタッチ反応改善
   document.addEventListener('touchstart', function () {}, true);
+
+  // データの初期化
   checkNewDay();
+
+  // UIイベントの設定
   const slider = document.getElementById('waterSlider');
   if (slider) slider.oninput = (e) => setWater(e.target.value);
+
   const undonBtn = document.querySelector('.btn-undon');
   if (undonBtn) undonBtn.onclick = showUndon;
 
+  // 各コンポーネントの起動
   URCHIN.init();
   initCalendar();
   updateUI();
 
+  // 通知トグルの状態復元
+  const savedNotify = localStorage.getItem('unicare_notification');
+  const toggle = document.getElementById('notificationToggle');
+  if (toggle && savedNotify === 'true') {
+    toggle.checked = true;
+  }
+
+  // インフォアイコン（ツールチップ）の制御
   document.querySelectorAll('.info-icon').forEach((icon) => {
     icon.onclick = (e) => {
       e.stopPropagation();
@@ -728,4 +771,12 @@ window.onload = () => {
   document.onclick = () => {
     document.querySelectorAll('.info-icon').forEach((i) => i.classList.remove('is-visible'));
   };
+
+  // サービスワーカーの登録
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then((reg) => console.log('ウニの分身(SW)が起動したよ！', reg))
+      .catch((err) => console.error('SWの起動に失敗しちゃった...', err));
+  }
 };
