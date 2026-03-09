@@ -997,7 +997,7 @@ input[type='range'] {
 .btn-reset-link {
   background: none;
   border: none;
-  color: #ccc; /* 背景に近い薄いグレー */
+  color: #ccc;
   font-size: 1rem;
   text-decoration: underline; /* リンクっぽく */
   cursor: pointer;
@@ -1018,7 +1018,7 @@ input[type='range'] {
 .btn-reset-link {
   position: relative;
   z-index: 100000;
-  cursor: pointer; /* マウスを乗せた時に指マークになるか確認 */
+  cursor: pointer;
 }
 
 /* 設定アイテムの行 */
@@ -1027,7 +1027,7 @@ input[type='range'] {
   margin: 0 auto 4rem;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* ラベルとスイッチを両端に */
+  justify-content: space-between;
   padding: 1.2rem 1.6rem;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 1.6rem;
@@ -1082,7 +1082,6 @@ input[type='range'] {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* ON状態の時：ウニ色（アクセントカラー）に */
 input:checked + .slider {
   background-color: var(--color-accent);
 }
